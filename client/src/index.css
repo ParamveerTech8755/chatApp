@@ -1,3 +1,11 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/*#root{
+	display: flex;
+	flex-direction: col;
+	align-items: stretch;
+	height: 100vh;
+	width: 100vw;
+}*/

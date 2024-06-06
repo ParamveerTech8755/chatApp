@@ -12,7 +12,7 @@ const app = express()
 
 
 // console.log(process.env.MONGO_URL)
-mongoose.connect(process.env.MONGO_URL)
+// mongoose.connect(process.env.MONGO_URL)
 //add error handling for this
 
 
@@ -26,15 +26,16 @@ app.get('/', (req, res) => {
 	res.send("test ok")
 })
 
-app.post('/register', async (req, res) => {
-	try{
-		const createdUser = await User.create(req.body)
-		const token = jwt.sign({userId: createdUser._id}, process.env.JWT_SECRET)
-		res.cookie('token', token).status(201).json({message: 'User created successfully!'})
-	}catch(error){
-		res.json({message: error.message || "An error occurred while creating the user"})
-	}
-	// res.send({message: "hello"})
+app.post('/register', (req, res) => {
+
+	// try{
+	// 	const createdUser = await User.create(req.body)
+	// 	const token = jwt.sign({userId: createdUser._id}, process.env.JWT_SECRET)
+	// 	res.cookie('token', token).status(201).json({message: 'User created successfully!'})
+	// }catch(error){
+	// 	res.json({message: error.message || "An error occurred while creating the user"})
+	// }
+	res.json(req.body)
 })
 
 app.listen(PORT, error => {

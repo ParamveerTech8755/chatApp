@@ -1,8 +1,20 @@
-import Register from "./components/Register.jsx"
+import Register from "./pages/Register.jsx"
+import {RouterProvider, createBrowserRouter} from "react-router-dom"
+import Root from "./pages/Root.jsx"
+const router  = createBrowserRouter([
+  {
+    path: '/',
+    element: <Root />,
+    children: [
+      {path: 'register', element: <Register />}
+    ]
+  }
+])
 
 export default function App(){
+
   return (
-    <Register />
+    <RouterProvider router={router} />
   )
 }
 
