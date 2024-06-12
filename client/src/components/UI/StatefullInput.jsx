@@ -13,7 +13,7 @@ export default function StatefullInput({className = '', ...props}){
 		<>
 			<input {...props} 
 			// value={data} onChange={({target}) => setData(target.value)}
-				className={`mb-1 rounded-md py-1 px-1 text-lg border-2 border-stone-200 ${className}`}
+				className={`mb-1 rounded-md p-1 text-lg border-2 border-stone-200 ${className}`}
 			/>
 			{after}
 		</>

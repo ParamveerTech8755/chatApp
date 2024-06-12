@@ -1,7 +1,9 @@
 import {redirect} from "react-router-dom"
+import axios from "axios"
 
-export const logoutLoader = setUserState => () => {
-	document.cookie="token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;"
+export const logoutLoader = setUserState => async () => {
+	const {data} = await axios.get('http://localhost:3000/logout', {withCredentials: true})
+
 	setUserState({
 		username: '',
 		id: null

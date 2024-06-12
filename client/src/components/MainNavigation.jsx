@@ -8,10 +8,8 @@ import UserContext from "../store/UserContextProvider.jsx"
 export default function MainNavigation(){
 	const {userState} = useContext(UserContext)
 
-	console.log(userState)
-
 	return (
-		<header className="flex justify-between items-center sticky top-0 bg-white/75 p-2">
+		<header className="flex justify-between items-center sticky top-0 bg-white/75 p-2 shadow-md">
 			<div className="flex items-center gap-0">
 			<img src={logoImg} className="object-contain max-h-16 max-w-16" />
 			<Heading>Chat App</Heading>

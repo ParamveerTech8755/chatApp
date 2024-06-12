@@ -6,11 +6,14 @@ import ErrorPage from "./pages/ErrorPage.jsx"
 import {useContext} from "react"
 import UserContext from "./store/UserContextProvider.jsx"
 import {logoutLoader} from "./pages/logout.js"
+import axios from "axios"
+import {loader as loaderFn, safeRoute} from "./util.js"
+import Chat from "./pages/Chat.jsx"
 
 
 export default function App(){
 
-    const {setUserState} = useContext(UserContext)
+    const {userState, setUserState} = useContext(UserContext)
 
     const router  = createBrowserRouter([
         {
@@ -18,11 +21,12 @@ export default function App(){
             errorElement: <ErrorPage />,
             element: <Root />,
             children: [
-                {path: 'register', element: <Register />, action: registerAction(setUserState)},
-                {path: 'login', element: <Login />, action: loginAction(setUserState)}
+                {path: 'register', element: <Register />, loader: loaderFn(userState), action: registerAction(setUserState)},
+                {path: 'login', element: <Login />, loader: loaderFn(userState), action: loginAction(setUserState)},
+                {path: 'chat', element: <Chat />},
+                {path: 'logout', loader: logoutLoader(setUserState)}
             ]
-        },
-        {path: '/logout', loader: logoutLoader(setUserState)}
+        }
       ])
 
 
@@ -30,6 +34,7 @@ export default function App(){
     <RouterProvider router={router} />
   )
 }
+export {axios}
 
 /*
 to do:
