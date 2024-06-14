@@ -13,7 +13,7 @@ export function WSContextProvider({children}){
 			return
 		if(ws)
 			ws.close()
-		const wsServer = new WebSocket('ws://localhost:3000/')
+		const wsServer = new WebSocket('ws://chatapp-93y0.onrender.com')
 		setWs(wsServer)
 		wsServer.addEventListener('disconnect', () => {
 			setTimeout(() => connectToWS(), 1000)
