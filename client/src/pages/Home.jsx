@@ -22,7 +22,7 @@ export default function Home(){
 async function loadPosts(){
 	//make a call for all the posts
 	try{
-		const response = await axios.get('https://chatapp-93y0.onrender.com', {withCredentials: true})
+		const response = await axios.get('https://chatapp-93y0.onrender.com/post', {withCredentials: true})
 		const posts = response.data
 		return posts
 
