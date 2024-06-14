@@ -48,7 +48,7 @@ export const registerAction = setUserState => async function action({request}){
 	const data = await request.formData()
 	const userData = Object.fromEntries(data.entries())
 	try{
-		const response = await axios.post('http://localhost:3000/register', userData, {withCredentials: true})
+		const response = await axios.post('https://chatapp-93y0.onrender.com/register', userData, {withCredentials: true})
 		// console.log(response.status)
 		if(response.status === 201){
 

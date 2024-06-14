@@ -31,7 +31,7 @@ function FileUpload ({goBack}) {
       if(acceptedFiles.length)
         fileData = {name: acceptedFiles[0].name, data: uploadedFile}
 
-      const response = await axios.post('http://localhost:3000/post',
+      const response = await axios.post('https://chatapp-93y0.onrender.com/post',
           {
             file: fileData,
             caption

@@ -2,7 +2,7 @@ import {redirect} from "react-router-dom"
 import axios from "axios"
 
 export const logoutLoader = setUserState => async () => {
-	const {data} = await axios.get('http://localhost:3000/logout', {withCredentials: true})
+	const {data} = await axios.get('https://chatapp-93y0.onrender.com/logout', {withCredentials: true})
 
 	setUserState({
 		username: '',
