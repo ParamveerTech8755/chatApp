@@ -10,7 +10,8 @@ export default function OnlineContacts({people, selectedUser, setSelectedUser}){
 		delete people[userState.id]
 
 	return (
-		<aside className="bg-blue-50 hidden h-full sm:block sm:max-md:w-1/3 md:w-80 bg-white px-2 pt-2">
+		<aside className="hidden h-full sm:block sm:max-md:w-1/3 md:w-80 bg-white relative">
+			<section className="absolute inset-0 h-full overflow-y-auto px-2 pt-2">
 				{Object.keys(people).map(userId => 
 					<Contact selectUser={() => {
 							// fetchMessages()
@@ -21,6 +22,7 @@ export default function OnlineContacts({people, selectedUser, setSelectedUser}){
 						username={people[userId].username} 
 						id={userId}
 						isSelected={userId === selectedUser} />)}
+			</section>
 		</aside>
 	)
 }

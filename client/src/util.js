@@ -1,4 +1,5 @@
 import {redirect} from "react-router-dom"
+
 export const loader = userState => () => {
 	if(userState.username)
 		return redirect('/')
@@ -6,8 +7,12 @@ export const loader = userState => () => {
 }
 
 export const safeRoute = userState => () => {
-	console.log(userState)
-	if(!userState.username)
+	if(!userState.id)
 		return redirect('/login')
 	return null
-} 
+}
+export function delay(time){
+	return new Promise(resolve => {
+		setTimeout(() => resolve('ok'), time)
+	})
+}

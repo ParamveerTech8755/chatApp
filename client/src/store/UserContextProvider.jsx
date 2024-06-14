@@ -9,13 +9,11 @@ export function UserContextProvider({children}){
 
 	useEffect(() => {
 		(async function(){
-			// const response = await fetch('http://localhost:3000/profile', {credentials: 'include'})
-			// const resData = await response.json()
+
 			try{
 				const {data, status} = await axios.get('http://localhost:3000/profile', {withCredentials: true})
 				if(status === 200){
 					setUserState(data)
-					// console.log('userState set')
 				}
 			}
 			catch({response}){
@@ -27,12 +25,12 @@ export function UserContextProvider({children}){
 
 	}, [])
 
-
 	return (
 		<UserContext.Provider value={{userState, setUserState}}>
 			{children}
 		</UserContext.Provider>
 	)
+
 }
 
 export default UserContext

@@ -1,36 +1,32 @@
 import {useEffect, useState, useContext, useRef} from "react"
-import {useNavigate} from "react-router-dom"
+import {useNavigate, Navigate} from "react-router-dom"
 import UserContext from "../store/UserContextProvider.jsx"
+import WSContext from "../store/WebSocketContextProvider.jsx"
 import SendButton from "../components/UI/SendButton.jsx"
 import OnlineContacts from "../components/OnlineContacts.jsx"
 import Message from "../components/Message.jsx"
 import {uniqBy} from "lodash"
-import axios from "axios"
 import AttachmentButton from "../components/UI/AttachmentButton.jsx"
+import {delay} from "../util.js"
+import axios from "axios"
 
 
 
 export default function Chat(){
 	const {userState} = useContext(UserContext)
-	const [ws, setWs] = useState(null)
+	const {ws, connectToWS} = useContext(WSContext)
 	const [people, setPeople] = useState({})
 	const [selectedUser, setSelectedUser] = useState(null)
 	const [messages, setMessages] = useState([])
 	const msgBox = useRef()
 	const navigate = useNavigate()
 
-
-	function connectToWS(){
-		if(userState.id){
-			console.log(selectedUser)
-			const wsServer = new WebSocket('ws://localhost:3000')
-			setWs(wsServer)
-			wsServer.addEventListener('message', handleMessage)
-			wsServer.addEventListener('close', () => {
-				setTimeout(() => connectToWS(), 1000)
-			})
+	useEffect(() => {
+		if(ws){
+			// connectToWS()
+			ws.addEventListener('message', handleMessage)
 		}
-	}
+	}, [ws])
 
 	useEffect(() => {
 		(async function(){
@@ -44,27 +40,28 @@ export default function Chat(){
 				}
 			})
 			setPeople(peopleObj)
-			connectToWS()
+			// connectToWS()
 		})()
 		
-	}, [userState, selectedUser])
+	}, [])
 
 	useEffect(() => {
 
 		// console.log('run')
 
 		(async function(){
-			if(selectedUser){
-				const {data} = await axios.get('http://localhost:3000/messages/' + selectedUser, {withCredentials: true})
-				const newMessages = data.map(obj => {
-					if(obj.sender === userState.id && obj.recipient === selectedUser)
-						return {me: true, text: obj.text, id: obj._id, file: obj.file}
-					else if(obj.sender === selectedUser && obj.recipient === userState.id)
-						return {me: false, text: obj.text, id: obj._id, file: obj.file}
-				})
+			if(!selectedUser)
+				return
 
-				setMessages(newMessages)
-			}
+			const {data} = await axios.get('http://localhost:3000/messages/' + selectedUser, {withCredentials: true})
+			const newMessages = data.map(obj => {
+				if(obj.sender === userState.id && obj.recipient === selectedUser)
+					return {me: true, text: obj.text, id: obj._id, file: obj.file}
+				else if(obj.sender === selectedUser && obj.recipient === userState.id)
+					return {me: false, text: obj.text, id: obj._id, file: obj.file}
+			})
+
+			setMessages(newMessages)
 
 		})()
 		
@@ -75,7 +72,6 @@ export default function Chat(){
 	}, [messages])
 
 	function showPeople(peopleArr){
-		// console.log('showOnlinePeople')
 		const peopleObj = {}
 		peopleArr.forEach(obj => {
 			// if(obj.id !== userState.id)
@@ -94,7 +90,6 @@ export default function Chat(){
 		else if('message' in msgData){
 			// console.log(msgData.message)
 			const {sender, text, id, recipient, file} = msgData.message
-			console.log(selectedUser)
 			if(sender === selectedUser && recipient === userState.id){
 				if(text)
 					setMessages(prevState => [...prevState, {me:false, text, id, file: null}])
@@ -153,7 +148,11 @@ export default function Chat(){
 		}
 	}
 
+
 	const uniqueMsgs = uniqBy(messages, 'id')
+
+	if(!userState.id)
+		return <Navigate to="/login" />
 
 	return (
 		<div className="h-full flex">
@@ -162,7 +161,7 @@ export default function Chat(){
 				<div className="grow relative">
 					{!selectedUser ?
 						<div className="font-bold text-stone-400 flex h-full justify-center items-center text-xl">&larr; Select a user</div> : 
-								<ul ref={msgBox} className="flex flex-col list-none h-full ml-2 absolute inset-0 overflow-y-auto">
+								<ul ref={msgBox} className="flex flex-col list-none mx-2 absolute bottom-0 right-0 overflow-y-auto">
 									{uniqueMsgs.map(msg => <Message key={msg.id} file={msg.file}
 										me={msg.me}>{msg.text}</Message>)}
 								</ul>

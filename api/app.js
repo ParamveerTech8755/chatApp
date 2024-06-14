@@ -3,6 +3,7 @@ import express from "express"
 import mongoose from "mongoose"
 import {UserModel as User} from "./models/User.js"
 import {MessageModel as Message} from "./models/Message.js"
+import {PostModel as Post} from "./models/Post.js"
 import jwt from "jsonwebtoken"
 import cors from "cors"
 import cookieParser from "cookie-parser"
@@ -11,8 +12,9 @@ import {WebSocketServer} from "ws"
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import fs from "fs"
+import bodyParser from "body-parser"
 
-const {compare, hash} = bcrypt
+const {compareSync, hash} = bcrypt
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const PORT = 3000
@@ -28,6 +30,7 @@ app.use(cors({
 	credentials:true,
 	origin: process.env.CLIENT_URL
 }))
+app.use('/posts', express.static(__dirname + '/posts'))
 app.use('/uploads', express.static(__dirname + '/uploads'))
 
 mongoose.connect(process.env.MONGO_URL)
@@ -46,6 +49,14 @@ function getUserData(req){
 	if(token)
 		return jwt.verify(token, process.env.JWT_SECRET)
 	return null
+}
+function generateName(name, id = ''){
+	const ext = name.split('.').at(-1)
+	return '' + Date.now() + id + '.' + ext
+}
+
+function getFileDataFromURL(data){
+	return data.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/)[2]
 }
 
 app.get('/profile', (req, res) => {
@@ -105,9 +116,9 @@ app.post('/login', async (req, res) => {
 	const {username, password} = req.body
 
 	try{
-		const user = await User.findOne({username: username})
+		const user = await User.findOne({username})
 		if(user){
-			if(compare(user.password, password)){
+			if(compareSync(password, user.password)){
 				//authenticate user		
 				const token = createToken({id: user._id, username: user.username})
 				setCookie(token, res).json({
@@ -152,6 +163,41 @@ app.get('/messages/:userId', async (req, res) => {
 
 })
 
+app.route('/post')
+	.post(async (req, res) => {
+		const {username, id} = getUserData(req)
+		const {file, caption} = req.body
+		let newName = null
+		if(file){
+			newName = generateName(file.name, id)
+			const fileData = getFileDataFromURL(file.data)
+			const path = __dirname + '/posts/' + newName
+			const bufferData = new Buffer(fileData, 'base64')
+			fs.writeFile(path, bufferData, () => {console.log('post saved')})
+		}
+		try{
+			const savedPost = await Post.create({
+				name: newName,
+				owner: username,
+				caption,
+				likes: [],
+			})
+			
+			res.json("ok").status(200)
+		}catch(err){
+			return res.status(500).json({message: 'request failed'})
+		}
+
+	})
+	.get(async (req, res) => {
+		try{
+			const posts = await Post.find({})
+			return res.status(200).json(posts)
+		}catch(err){
+			res.status(500).json({message: 'failed to load posts'})
+		}
+	})
+
 
 const server = app.listen(PORT, error => {
 	console.log(`Server running on port ${PORT}.`)
@@ -182,16 +228,16 @@ wss.on('connection', (connection, req) => {
 	notifyOnlineClients(wss)
 
 	connection.on('message', async message => {
-		const {recipient, text, file} = JSON.parse(message.toString())
-		if(recipient){
+		const msgData = JSON.parse(message.toString())
+
+		if(msgData.recipient){
+			const {recipient, text, file} = msgData
 			const data = {recipient, text: null, sender: connection.id, file: null}
 			if(file){
-				//change name
-				const ext = file.name.split('.').at(-1)
-				const newName = Date.now() + '.' + ext
+				const newName = generateName(file.name, data.sender)
 				const path = __dirname + '/uploads/' + newName
 				// console.log(file)
-				const fileData = file.data.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/)[2]
+				const fileData = getFileDataFromURL(file.data)
 				const bufferData = new Buffer(fileData, 'base64')
 				fs.writeFile(path, bufferData, () => {console.log('file saved')})
 				data.file = newName
@@ -206,9 +252,27 @@ wss.on('connection', (connection, req) => {
 			connection.send(JSON.stringify(response))
 			recipients.forEach(client => client.send(JSON.stringify(response)))
 		}
+		else if(msgData.postId){
+			const {postId, likes} = msgData
+
+			const postDoc = await Post.findById(postId)
+			postDoc.likes = likes
+			await postDoc.save()
+
+			const recipients = [...wss.clients].filter(client => client.id !== connection.id)
+			recipients.forEach(client => client.send(JSON.stringify({
+				post: {
+					id: postId,
+					likes
+				}
+			})))
+		}
 	})
 
 	connection.on('close', () => {
+		notifyOnlineClients(wss)
+	})
+	connection.on('disconnect', () => {
 		notifyOnlineClients(wss)
 	})
 

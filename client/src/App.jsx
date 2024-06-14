@@ -9,6 +9,7 @@ import {logoutLoader} from "./pages/logout.js"
 import axios from "axios"
 import {loader as loaderFn, safeRoute} from "./util.js"
 import Chat from "./pages/Chat.jsx"
+import Home, {loader as postLoader} from "./pages/Home.jsx"
 
 
 export default function App(){
@@ -21,6 +22,7 @@ export default function App(){
             errorElement: <ErrorPage />,
             element: <Root />,
             children: [
+                {index: true, element: <Home />, loader: postLoader(userState)},
                 {path: 'register', element: <Register />, loader: loaderFn(userState), action: registerAction(setUserState)},
                 {path: 'login', element: <Login />, loader: loaderFn(userState), action: loginAction(setUserState)},
                 {path: 'chat', element: <Chat />},

@@ -4,6 +4,9 @@ import Heading from "./UI/Heading.jsx"
 import {Link} from "react-router-dom"
 import {useContext, useState} from "react"
 import UserContext from "../store/UserContextProvider.jsx"
+import HomeSVG from "./UI/HomeSVG.jsx"
+import ChatSVG from "./UI/ChatSVG.jsx"
+import CustomLink from "./UI/CustomLink.jsx"
 
 export default function MainNavigation(){
 	const {userState} = useContext(UserContext)
@@ -11,8 +14,16 @@ export default function MainNavigation(){
 	return (
 		<header className="flex justify-between items-center sticky top-0 bg-white/75 p-2 shadow-md">
 			<div className="flex items-center gap-0">
-			<img src={logoImg} className="object-contain max-h-16 max-w-16" />
-			<Heading>Chat App</Heading>
+				<img src={logoImg} className="object-contain max-h-16 max-w-16" />
+				<Heading>Chat App</Heading>
+				<nav className="ml-4 md:ml-20 flex gap-8">
+					<CustomLink to="/" text="Home">
+						<HomeSVG />
+					</CustomLink>
+					<CustomLink to="/chat" text="Chat">
+						<ChatSVG />
+					</CustomLink>
+				</nav>
 			</div>
 			<div>
 			{	userState.username ?
