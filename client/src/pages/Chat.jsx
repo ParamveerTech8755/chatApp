@@ -30,7 +30,7 @@ export default function Chat(){
 
 	useEffect(() => {
 		(async function(){
-			const {data: peopleArr} = await axios.get('https://chatapp-93y0.onrender.com/people', {withCredentials: true})
+			const {data: peopleArr} = await axios.get(import.meta.env.VITE_BASE_URL + '/people', {withCredentials: true})
 			// console.log(peopleObj)
 			const peopleObj = {}
 			peopleArr.forEach(person => {
@@ -53,7 +53,7 @@ export default function Chat(){
 			if(!selectedUser)
 				return
 
-			const {data} = await axios.get('https://chatapp-93y0.onrender.com/messages/' + selectedUser, {withCredentials: true})
+			const {data} = await axios.get(import.meta.env.VITE_BASE_URL + '/messages' + selectedUser, {withCredentials: true})
 			const newMessages = data.map(obj => {
 				if(obj.sender === userState.id && obj.recipient === selectedUser)
 					return {me: true, text: obj.text, id: obj._id, file: obj.file}

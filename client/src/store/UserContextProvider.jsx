@@ -11,14 +11,14 @@ export function UserContextProvider({children}){
 		(async function(){
 
 			try{
-				const {data, status} = await axios.get('https://chatapp-93y0.onrender.com/profile', {withCredentials: true})
+				const {data, status} = await axios.get(import.meta.env.VITE_BASE_URL + '/profile', {withCredentials: true})
 				if(status === 200){
 					setUserState(data)
 				}
 			}
 			catch({response}){
-				if(response.status === 401 && location.href !== 'https://chatapp-93y0.onrender.com/login')
-					location.href = '/login'
+				if(response.status === 401 && location.href !== 'https://chat-app-pied-eight.vercel.app/login')
+					location.href = 'https://chat-app-pied-eight.vercel.app/login'
 			}
 		
 		})()

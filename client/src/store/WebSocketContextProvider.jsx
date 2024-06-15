@@ -13,7 +13,9 @@ export function WSContextProvider({children}){
 			return
 		if(ws)
 			ws.close()
-		const wsServer = new WebSocket('wss://chatapp-93y0.onrender.com')
+		const urlArr = import.meta.env.VITE_BASE_URL.split('//')
+		const type = urlArr[0] === 'http:' ? 'ws' : 'wss'
+		const wsServer = new WebSocket(type + '://' + urlArr[1])
 		setWs(wsServer)
 		wsServer.addEventListener('disconnect', () => {
 			setTimeout(() => connectToWS(), 1000)

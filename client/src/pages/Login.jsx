@@ -49,7 +49,7 @@ export const loginAction = setUserState => async function action({request}){
 	const data = await request.formData()
 	const userData = Object.fromEntries(data.entries())
 	try{
-		const response = await axios.post('https://chatapp-93y0.onrender.com/login', userData, {withCredentials: true})
+		const response = await axios.post(import.meta.env.VITE_BASE_URL + '/login', userData, {withCredentials: true})
 		// console.log(response.status)
 		if(response.status === 201){
 
