@@ -40,7 +40,7 @@ export default function Chat(){
 			// connectToWS()
 			ws.addEventListener('message', handleMessage)
 		}
-	}, [ws])
+	}, [ws, selectedUser])
 
 	useEffect(() => {
 		fetchUsers()

@@ -9,6 +9,7 @@ export default function Post({id, likes, file, caption, owner}){
 	const {ws} = useContext(WSContext)
 	const [likeArr, setLikeArr] = useState(likes)
 	//check if this user has liked this post or not
+	// console.log(likeArr)
 	const isLiked = likeArr.includes(userState.id)
 
 	// const [likeNum, setLikeNum] = useState(likes.length)
@@ -26,8 +27,10 @@ export default function Post({id, likes, file, caption, owner}){
 			likes:
 		*/
 		// console.log('here')
-		if(message.post && message.post.id === id)
+		if(message.post && message.post.id === id){
+			console.log(message.post.likes)
 			setLikeArr(message.post.likes)
+		}
 	}
 
 	function callAPI(newLikes){
@@ -39,12 +42,20 @@ export default function Post({id, likes, file, caption, owner}){
 
 	function toggleLike(){
 		let newLikes = []
+		console.log(isLiked)
 
 		if(isLiked)
-			setLikeArr(prevArr => newLikes = prevArr.filter(id => id !== userState.id))
+			setLikeArr(prevArr => {
+				newLikes = prevArr.filter(id => id !== userState.id)
+				callAPI(newLikes)
+				return newLikes
+			})
 		else
-			setLikeArr(prevArr => newLikes = [userState.id, ...prevArr])
-		callAPI(newLikes)
+			setLikeArr(prevArr => {
+				newLikes = [userState.id, ...prevArr]
+				callAPI(newLikes)
+				return newLikes
+			})
 	}
 
 	return (

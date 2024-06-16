@@ -258,6 +258,7 @@ wss.on('connection', (connection, req) => {
 		}
 		else if(msgData.postId){
 			const {postId, likes} = msgData
+			console.log('liked or disliked')
 
 			const postDoc = await Post.findById(postId)
 			postDoc.likes = likes
