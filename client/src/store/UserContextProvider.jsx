@@ -17,8 +17,8 @@ export function UserContextProvider({children}){
 				}
 			}
 			catch({response}){
-				if(response.status === 401 && location.href !== 'https://chat-app-pied-eight.vercel.app/login')
-					location.href = 'https://chat-app-pied-eight.vercel.app/login'
+				if(response.status === 401 && location.href !== 'http://localhost:5173/login')
+					location.href = 'http://localhost:5173/login'
 			}
 		
 		})()

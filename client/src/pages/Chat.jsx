@@ -1,5 +1,5 @@
 import {useEffect, useState, useContext, useRef} from "react"
-import {useNavigate, Navigate} from "react-router-dom"
+import {useNavigate} from "react-router-dom"
 import UserContext from "../store/UserContextProvider.jsx"
 import WSContext from "../store/WebSocketContextProvider.jsx"
 import SendButton from "../components/UI/SendButton.jsx"
@@ -21,6 +21,20 @@ export default function Chat(){
 	const msgBox = useRef()
 	const navigate = useNavigate()
 
+	async function fetchUsers(){
+		const {data: peopleArr} = await axios.get(import.meta.env.VITE_BASE_URL + '/people', {withCredentials: true})
+		// console.log(peopleObj)
+		const peopleObj = {}
+		peopleArr.forEach(person => {
+			peopleObj[person._id] = {
+				username: person.username,
+				online: false
+			}
+		})
+		setPeople(peopleObj)
+		return
+	}
+
 	useEffect(() => {
 		if(ws){
 			// connectToWS()
@@ -29,20 +43,7 @@ export default function Chat(){
 	}, [ws])
 
 	useEffect(() => {
-		(async function(){
-			const {data: peopleArr} = await axios.get(import.meta.env.VITE_BASE_URL + '/people', {withCredentials: true})
-			// console.log(peopleObj)
-			const peopleObj = {}
-			peopleArr.forEach(person => {
-				peopleObj[person._id] = {
-					username: person.username,
-					online: false
-				}
-			})
-			setPeople(peopleObj)
-			// connectToWS()
-		})()
-		
+		fetchUsers()
 	}, [])
 
 	useEffect(() => {
@@ -53,7 +54,7 @@ export default function Chat(){
 			if(!selectedUser)
 				return
 
-			const {data} = await axios.get(import.meta.env.VITE_BASE_URL + '/messages' + selectedUser, {withCredentials: true})
+			const {data} = await axios.get(import.meta.env.VITE_BASE_URL + '/messages/' + selectedUser, {withCredentials: true})
 			const newMessages = data.map(obj => {
 				if(obj.sender === userState.id && obj.recipient === selectedUser)
 					return {me: true, text: obj.text, id: obj._id, file: obj.file}
@@ -80,7 +81,9 @@ export default function Chat(){
 					online: obj.online
 				}
 		})
-		setPeople(prev => ({...prev, ...peopleObj}))
+		setPeople(prev => {
+			return {...prev, ...peopleObj}
+		})
 	}
 
 	function handleMessage(event){
@@ -151,9 +154,6 @@ export default function Chat(){
 
 	const uniqueMsgs = uniqBy(messages, 'id')
 
-	if(!userState.id)
-		return <Navigate to="/login" />
-
 	return (
 		<div className="h-full flex">
 			<OnlineContacts people={people} setSelectedUser={setSelectedUser} selectedUser={selectedUser} />
@@ -161,7 +161,7 @@ export default function Chat(){
 				<div className="grow relative">
 					{!selectedUser ?
 						<div className="font-bold text-stone-400 flex h-full justify-center items-center text-xl">&larr; Select a user</div> : 
-								<ul ref={msgBox} className="flex flex-col list-none mx-2 absolute bottom-0 right-0 overflow-y-auto">
+								<ul ref={msgBox} className="flex flex-col list-none w-full px-2 absolute bottom-0 right-0 overflow-y-auto">
 									{uniqueMsgs.map(msg => <Message key={msg.id} file={msg.file}
 										me={msg.me}>{msg.text}</Message>)}
 								</ul>

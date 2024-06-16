@@ -67,7 +67,7 @@ function FileUpload ({goBack}) {
       <div {...getRootProps()}
         className={"outline-none h-full rounded-md w-full border-2 border-blue-200 border-dashed flex flex-col justify-center items-center " + 
         (!uploadedFile ? "hover:cursor-pointer" : null)}>
-      {uploadedFile ? <p className="text-center font-bold">Preview<img src={uploadedFile} /></p> : 
+      {uploadedFile ? <p className="text-center font-bold">Preview<img src={uploadedFile} className="object-contain heighth-[80%] w-auto"/></p> : 
         <p className="text-sm text-center">Drag and drop a file here or click to browse.</p>}
           {!uploadedFile && <input {...getInputProps()} multiple={false} accept="image/*" />}  
       </div>

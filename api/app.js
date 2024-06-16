@@ -224,8 +224,12 @@ wss.on('connection', (connection, req) => {
 			connection.username = username
 		}
 	}
-	
+	// console.log(wss.clients)
 	notifyOnlineClients(wss)
+
+	connection.isAlive = true
+	connection.on('pong', () => {connection.isAlive = true})
+
 
 	connection.on('message', async message => {
 		const msgData = JSON.parse(message.toString())
@@ -269,11 +273,34 @@ wss.on('connection', (connection, req) => {
 		}
 	})
 
-	connection.on('close', () => {
-		notifyOnlineClients(wss)
-	})
-	connection.on('disconnect', () => {
-		notifyOnlineClients(wss)
-	})
+const interval = setInterval(function ping() {
+  wss.clients.forEach(function each(ws) {
+    if (ws.isAlive === false) return ws.terminate();
+
+    ws.isAlive = false;
+    ws.ping();
+  });
+}, 3000);
+
+wss.on('close', function close() {
+  clearInterval(interval);
+  notifyOnlineClients(wss)
+});
+
+	// connection.on('close', () => {
+	// 	console.log('closed')
+	// 	notifyOnlineClients(wss)
+	// })
+	// connection.on('disconnect', () => {
+	// 	console.log('disconnected')
+	// 	notifyOnlineClients(wss)
+	// })
 
 })
+
+// wss.on('close', () => {
+// 	console.log('closed')
+// })
+// wss.on('disconnected', () => {
+// 	console.log('disconnected')
+// })

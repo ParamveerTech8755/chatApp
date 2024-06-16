@@ -44,17 +44,16 @@ export default function Post({id, likes, file, caption, owner}){
 			setLikeArr(prevArr => newLikes = prevArr.filter(id => id !== userState.id))
 		else
 			setLikeArr(prevArr => newLikes = [userState.id, ...prevArr])
-		console.log(newLikes)
 		callAPI(newLikes)
 	}
 
 	return (
-		<div className="max-h-2/3 md:max-h-1/3 shadow-lg flex flex-col gap-1 mb-4 px-2">
-			{file && <a href={`http://localhost:3000/posts/${file}`} target="_blank">
-				<div className="bg-black h-2/3">
-					<img src={`http://localhost:3000/posts/${file}`} className="object-contain" />
-				</div>
+		<div className="h-[80%] shadow-lg flex flex-col gap-1 mb-4 px-2">
+			{file && 	<div className="bg-black h-[75%] flex justify-center">
+			<a href={`http://localhost:3000/posts/${file}`} target="_blank">
+					<img src={`http://localhost:3000/posts/${file}`} className="object-scale-down w-auto h-full" />
 				</a>
+				</div>
 			}
 			<p className="font-bold text-xl mb-2">{owner}</p>
 			{caption && <p className="whitespace-pre mb-2">{caption}</p>}
